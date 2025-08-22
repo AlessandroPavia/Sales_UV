@@ -7,6 +7,8 @@ import networkx as nx
 import plotly.express as px
 from scipy import stats
 
+'''questo file è quello definitivo'''
+
 def detect_outliers(df, col_name, method="iqr", threshold=1.5):
     """
     Rileva outlier in una colonna usando IQR o Z-score.
@@ -420,6 +422,34 @@ if uploaded_file is not None:
             st.pyplot(plt)
 
         
+
+                    
+
+            #heatmap
+
+            # Ciclo sulle regioni
+            for regione in df['Region'].unique():
+                # filtro solo quella regione
+                df_regione = df[df['Region'] == regione]
+
+                # creo matrice stati × mesi
+                ordini_state = df_regione.groupby(['State_def', 'Order Month'])['Order ID'].nunique().unstack(fill_value=0)
+
+                if ordini_state.empty:   # se la regione non ha dati, skippo
+                    continue
+
+                # ordino gli stati in base al totale ordini (dall’alto al basso)
+                ordini_state_sorted = ordini_state.loc[ordini_state.sum(axis=1).sort_values(ascending=False).index]
+
+
+                fig5, ax5 = plt.subplots(figsize=(10, 6))
+                sns.heatmap(ordini_state_sorted, cmap="YlOrRd", linewidths=0.3)
+                plt.title(f"Numero di ordini per stato ({regione})")
+                plt.xlabel("Mese")
+                plt.ylabel("Stato")
+                plt.xticks(rotation=45)
+                st.pyplot(fig5)
+
         '''
         for col3 in df.columns:  
             if pd.api.types.is_string_dtype(df[col3]):
@@ -432,34 +462,7 @@ if uploaded_file is not None:
                 (df_gerarchie["nunique_child"] <= 50))
                 )
                 if mask.any():   # cioè esiste almeno una riga che rispetta tutte le condizioni
-                # fai quello che ti serve
-
-                    
-
-            #heatmap
-
-            # Ciclo sulle regioni
-                    for regione in df['Region'].unique():
-                        # filtro solo quella regione
-                        df_regione = df[df['Region'] == regione]
-
-                        # creo matrice stati × mesi
-                        ordini_state = df_regione.groupby(['State_def', 'Order Month'])['Order ID'].nunique().unstack(fill_value=0)
-
-                        if ordini_state.empty:   # se la regione non ha dati, skippo
-                            continue
-
-                        # ordino gli stati in base al totale ordini (dall’alto al basso)
-                        ordini_state_sorted = ordini_state.loc[ordini_state.sum(axis=1).sort_values(ascending=False).index]
-
-
-                        fig5, ax5 = plt.subplots(figsize=(10, 6))
-                        sns.heatmap(ordini_state_sorted, cmap="YlOrRd", linewidths=0.3)
-                        plt.title(f"Numero di ordini per stato ({regione})")
-                        plt.xlabel("Mese")
-                        plt.ylabel("Stato")
-                        plt.xticks(rotation=45)
-                        st.pyplot(fig5)'''
+                # fai quello che ti serve'''
 
 else:
     st.info("⬆️ Carica un file CSV per iniziare.")
